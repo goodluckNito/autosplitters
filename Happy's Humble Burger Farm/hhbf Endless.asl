@@ -15,12 +15,12 @@ init
   {
     var pm = "progressManager";
     var bfm = "burgerFarmManager";
-    var rsm = "simStartLeverScript";
+    var ssls = "simStartLeverScript";
 
     vars.Helper["Scene"] = mono.MakeString(pm, "instance", "currentScene");
     vars.Helper["Money"] = mono.Make<int>(pm, "instance", "currency");
     vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen");
-    vars.Helper["DinerOpen"] = mono.Make<bool>(rsm, "instance", "broken");
+    vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");
     return true;
   });
 
@@ -28,12 +28,13 @@ init
 
 start
 {
-	if (old.Scene == "Main Menu" && current.Scene != old.Scene && current.Scene != "Apartment")
-	{
+	return old.Scene == "Main Menu" && current.Scene != old.Scene && current.Scene != "Apartment";
+}
+
+onStart
+{
 		vars.startMoney = current.Money;
 		vars.counter = 0;
-		return true;
-	}
 }
 
 update
@@ -76,9 +77,10 @@ split
 
 reset
 {
-	if (old.Scene != "Main Menu" && current.Scene == "Main Menu"){
-		return true;
-		vars.counter = 0;
-	}
+	return old.Scene != "Main Menu" && current.Scene == "Main Menu";
+}
 
+onReset
+{
+  vars.counter = 0;
 }
