@@ -1,4 +1,4 @@
-//Thanks to Ero on the Speedrun Tool Dev Discord for asl-help and help with this.
+//Thanks to Ero and diggitydingdong for help with this.
 state("Happy's Humble Burger Farm") {}
 
 startup
@@ -6,7 +6,24 @@ startup
 	Assembly.Load(File.ReadAllBytes("Components/asl-help")).CreateInstance("Unity");
 	vars.Helper.GameName = "Happy's Humble Burger Farm";
 	vars.startMoney = 0;
-	vars.counter = 0;
+    // setup endless splits
+	vars.Splits = new Dictionary<string, string>() {
+    	{ "split_el_farm_open", "Split on opening the farm." },
+    	{ "split_el_diner_open", "Split on opening the diner." },
+   	{ "split_el_100", "Split on making $100." },
+   	{ "split_el_200", "Split on making $200." },
+  	{ "split_el_300", "Split on making $300." },
+   	{ "split_el_400", "Split on making $400." },
+   	};
+  // putting this under endless split parent anticipating future merge with main asl
+  settings.Add("endless_splits", false, "Endless% Splits");
+  foreach(var split in vars.Splits.Keys)
+  {
+    settings.Add(split, false, vars.Splits[split], "endless_splits");
+  }
+
+  // ensures we don't split on the same condition twice
+  vars.CompletedSplits = new Dictionary<string, bool>();
 }
 
 init
@@ -19,8 +36,8 @@ init
 
     vars.Helper["Scene"] = mono.MakeString(pm, "instance", "currentScene");
     vars.Helper["Money"] = mono.Make<int>(pm, "instance", "currency");
-    vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen");
-    vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");
+    vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen"); //open button in Farm restaurant
+    vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");//open lever in Diner restaurant
     return true;
   });
 
@@ -28,13 +45,12 @@ init
 
 start
 {
-	return old.Scene == "Main Menu" && current.Scene != old.Scene && current.Scene != "Apartment";
+  return old.Scene == "Main Menu" && current.Scene != old.Scene && current.Scene != "Apartment";
 }
 
 onStart
 {
-		vars.startMoney = current.Money;
-		vars.counter = 0;
+  vars.startMoney = current.Money;
 }
 
 update
@@ -45,42 +61,35 @@ update
 
 split
 {
-	if (current.Scene == "BurgerFarm" && current.FarmOpen && vars.counter < 1) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
-	if (current.Scene == "50s_Diner" && current.DinerOpen && vars.counter < 1) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
-	if (current.Money - vars.startMoney >= 100 && current.Money - vars.startMoney <= 199 && vars.counter < 2) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
-	if (current.Money - vars.startMoney >= 200 && current.Money - vars.startMoney <= 299 && vars.counter < 3) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
-	if (current.Money - vars.startMoney >= 300 && current.Money - vars.startMoney <= 399 && vars.counter < 4) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
-	if (current.Money - vars.startMoney >= 400 && current.Money - vars.startMoney <= 499 && vars.counter < 5) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
-	if (current.Money - vars.startMoney >= 500 && vars.counter < 6) {
-		vars.counter = vars.counter + 1;
-		return true;
-	}
+  var moneyMade = current.Money - vars.startMoney;
+
+  //Split on opening the farm
+  if (settings["split_el_farm_open"] && current.Scene == "BurgerFarm
+  && !old.FarmOpen && current.FarmOpen)
+  {
+    vars.CompletedSplits["split_el_farm_open"] = true;
+    return true;
+  }
+  //Split on opening the diner
+  if (settings["split_el_diner_open"] && current.Scene == "50s_Diner"
+  && !old.DinerOpen && current.DinerOpen)
+  {
+    vars.CompletedSplits["split_el_diner_open"] = true;
+    return true;
+  }
+  //Split every $100
+  for (int i = 100; i <= moneyMade && i <= 500; i += 100)
+  {
+    var key = "split_el_" + i;
+    if (!settings.ContainsKey(key) || (settings[key] && !vars.CompletedSplits[key]))
+    {
+      vars.CompletedSplits[key] = true;
+      return true;
+    }
+  }
 }
 
 reset
 {
-	return old.Scene != "Main Menu" && current.Scene == "Main Menu";
-}
-
-onReset
-{
-  vars.counter = 0;
+  return old.Scene != "Main Menu" && current.Scene == "Main Menu";
 }
