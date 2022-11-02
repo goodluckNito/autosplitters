@@ -36,8 +36,8 @@ init
 
     vars.Helper["Scene"] = mono.MakeString(pm, "instance", "currentScene");
     vars.Helper["Money"] = mono.Make<int>(pm, "instance", "currency");
-    vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen"); //open button in Farm restaurant
-    vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");//open lever in Diner restaurant
+    vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen"); //open button in Farm
+    vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");//open lever in Diner
     return true;
   });
 
@@ -63,21 +63,21 @@ split
 {
   var moneyMade = current.Money - vars.startMoney;
 
-  //Split on opening the farm
+//Split on opening the farm
   if (settings["split_el_farm_open"] && current.Scene == "BurgerFarm
   && !old.FarmOpen && current.FarmOpen)
   {
     vars.CompletedSplits["split_el_farm_open"] = true;
     return true;
   }
-  //Split on opening the diner
+//Split on opening the diner
   if (settings["split_el_diner_open"] && current.Scene == "50s_Diner"
   && !old.DinerOpen && current.DinerOpen)
   {
     vars.CompletedSplits["split_el_diner_open"] = true;
     return true;
   }
-  //Split every $100
+//Split every $100
   for (int i = 100; i <= moneyMade && i <= 500; i += 100)
   {
     var key = "split_el_" + i;
