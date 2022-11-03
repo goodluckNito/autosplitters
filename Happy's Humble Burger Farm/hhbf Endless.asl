@@ -64,7 +64,7 @@ split
   var moneyMade = current.Money - vars.startMoney;
 
 //Split on opening the farm
-  if (settings["split_el_farm_open"] && current.Scene == "BurgerFarm
+  if (settings["split_el_farm_open"] && current.Scene == "BurgerFarm"
   && !old.FarmOpen && current.FarmOpen)
   {
     vars.CompletedSplits["split_el_farm_open"] = true;
