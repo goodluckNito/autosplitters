@@ -55,6 +55,10 @@ start
 onStart
 {
   vars.startMoney = current.Money;
+    foreach(var split in vars.Splits.Keys)
+  {
+    vars.CompletedSplits[split] = false;
+  }
 }
 
 update
@@ -66,7 +70,6 @@ update
 split
 {
   var moneyMade = current.Money - vars.startMoney;
-
 //Split on opening the farm
   if (settings["split_el_farm_open"] && current.Scene == "BurgerFarm"
   && !old.FarmOpen && current.FarmOpen)
