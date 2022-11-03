@@ -3,18 +3,18 @@ state("Happy's Humble Burger Farm") {}
 
 startup
 {
-	Assembly.Load(File.ReadAllBytes("Components/asl-help")).CreateInstance("Unity");
-	vars.Helper.GameName = "Happy's Humble Burger Farm";
-	vars.startMoney = 0;
+  Assembly.Load(File.ReadAllBytes("Components/asl-help")).CreateInstance("Unity");
+  vars.Helper.GameName = "Happy's Humble Burger Farm";
+  vars.startMoney = 0;
     // setup endless splits
-	vars.Splits = new Dictionary<string, string>() {
-    	{ "split_el_farm_open", "Split on opening the farm." },
-    	{ "split_el_diner_open", "Split on opening the diner." },
-   	{ "split_el_100", "Split on making $100." },
-   	{ "split_el_200", "Split on making $200." },
-  	{ "split_el_300", "Split on making $300." },
-   	{ "split_el_400", "Split on making $400." },
-   	};
+  vars.Splits = new Dictionary<string, string>() {
+    { "split_el_farm_open", "Split on opening the farm." },
+    { "split_el_diner_open", "Split on opening the diner." },
+    { "split_el_100", "Split on making $100." },
+    { "split_el_200", "Split on making $200." },
+    { "split_el_300", "Split on making $300." },
+    { "split_el_400", "Split on making $400." },
+    };
   // putting this under endless split parent anticipating future merge with main asl
   settings.Add("endless_splits", false, "Endless% Splits");
   foreach(var split in vars.Splits.Keys)
