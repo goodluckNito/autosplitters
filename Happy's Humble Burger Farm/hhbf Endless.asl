@@ -17,11 +17,12 @@ startup
     };
   // putting this under endless split parent anticipating future merge with main asl
   settings.Add("endless_splits", false, "Endless% Splits");
+  settings.Add("farm_enabled", false, "Farm Enabled", "endless_splits"); //Enable splitting for Farm
+  settings.Add("diner_enabled", false, "Diner Enabled", "endless_splits"); //Enable splitting for Diner
   foreach(var split in vars.Splits.Keys)
   {
     settings.Add(split, false, vars.Splits[split], "endless_splits");
   }
-
   // ensures we don't split on the same condition twice
   vars.CompletedSplits = new Dictionary<string, bool>();
 }
@@ -31,13 +32,16 @@ init
   vars.Helper.TryLoad = (Func<dynamic, bool>)(mono =>
   {
     var pm = "progressManager";
-    var bfm = "burgerFarmManager";
-    var ssls = "simStartLeverScript";
-
     vars.Helper["Scene"] = mono.MakeString(pm, "instance", "currentScene");
     vars.Helper["Money"] = mono.Make<int>(pm, "instance", "currency");
-    vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen"); //open button in Farm
-    vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");//open lever in Diner
+    if (settings["farm_enabled"]) {
+      var bfm = "burgerFarmManager";
+      vars.Helper["FarmOpen"] = mono.Make<bool>(bfm, "instance", "isOpen"); 
+    }
+    if (settings["diner_enabled"]) {
+      var ssls = "simStartLeverScript";
+      vars.Helper["DinerOpen"] = mono.Make<bool>(ssls, "instance", "broken");//open lever in Diner
+    }
     return true;
   });
 
